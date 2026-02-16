@@ -40,7 +40,7 @@ class TestGetModel:
             model = get_model()
             assert model.config["audio"]["voice"] == "matthew"
 
-    def test_sample_rate_16k(self):
+    def test_sample_rate(self):
         model = get_model()
         assert model.config["audio"]["input_sample_rate"] == 16000
-        assert model.config["audio"]["output_sample_rate"] == 16000
+        assert model.config["audio"]["output_sample_rate"] == 24000

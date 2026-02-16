@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react';
 
-const SOURCE_SAMPLE_RATE = 16000;
+const SOURCE_SAMPLE_RATE = 24000;
 
 function base64ToInt16(base64: string): Int16Array {
   const binary = atob(base64);

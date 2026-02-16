@@ -19,11 +19,11 @@ def get_model() -> BidiNovaSonicModel:
     voice = os.environ.get("NOVA_SONIC_VOICE", "tiffany")
 
     return BidiNovaSonicModel(
-        model_id="amazon.nova-sonic-v1:0",
+        model_id="amazon.nova-2-sonic-v1:0",
         provider_config={
             "audio": {
                 "input_sample_rate": 16000,
-                "output_sample_rate": 16000,
+                "output_sample_rate": 24000,
                 "voice": voice,
             },
         },
