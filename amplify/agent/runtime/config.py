@@ -22,8 +22,8 @@ def get_model() -> BidiNovaSonicModel:
         model_id="amazon.nova-2-sonic-v1:0",
         provider_config={
             "audio": {
-                "input_sample_rate": 16000,
-                "output_sample_rate": 24000,
+                "input_rate": 16000,
+                "output_rate": 24000,
                 "voice": voice,
             },
         },
