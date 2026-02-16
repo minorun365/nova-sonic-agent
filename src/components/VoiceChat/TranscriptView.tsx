@@ -14,9 +14,9 @@ export function TranscriptView({ entries, activeTool }: TranscriptViewProps) {
   }, [entries, activeTool]);
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
       {entries.length === 0 && !activeTool && (
-        <p className="text-center text-gray-400 mt-8">
+        <p className="text-center text-gray-300 mt-16">
           マイクボタンを押して話しかけてください
         </p>
       )}
@@ -28,10 +28,10 @@ export function TranscriptView({ entries, activeTool }: TranscriptViewProps) {
         >
           <div
             className={`
-              max-w-[80%] px-4 py-2 rounded-2xl text-sm
+              max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed
               ${entry.role === 'user'
-                ? 'bg-indigo-600 text-white rounded-br-md'
-                : 'bg-white text-gray-800 shadow-sm border rounded-bl-md'
+                ? 'bg-blue-500 text-white rounded-br-md'
+                : 'bg-gray-100 text-gray-800 rounded-bl-md'
               }
               ${!entry.isFinal ? 'opacity-60' : ''}
             `}
@@ -43,7 +43,7 @@ export function TranscriptView({ entries, activeTool }: TranscriptViewProps) {
 
       {activeTool && (
         <div className="flex justify-start">
-          <div className="bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-2xl text-sm animate-pulse">
+          <div className="bg-gray-50 text-gray-500 border border-gray-200 px-4 py-2.5 rounded-2xl text-sm animate-pulse">
             {activeTool} を実行中...
           </div>
         </div>

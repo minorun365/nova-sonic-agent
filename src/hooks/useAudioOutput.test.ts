@@ -19,7 +19,7 @@ describe('useAudioOutput', () => {
   it('init 前の playAudio は安全にスキップされる', () => {
     const { result } = renderHook(() => useAudioOutput());
 
-    // workletNode が null なのでエラーにならない
+    // audioContext が null なのでエラーにならない
     act(() => {
       result.current.playAudio('AAAA');
     });

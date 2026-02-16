@@ -11,29 +11,31 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to right, #1e1b4b, #3b82f6);
+  background: #ffffff;
 }
 
 [data-amplify-authenticator] [data-amplify-router] {
   border: none;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
 }
 
 [data-amplify-authenticator] .amplify-button--primary {
-  background: linear-gradient(to right, #1e1b4b, #3b82f6);
+  background: #3b82f6;
   border: none;
+  border-radius: 0.75rem;
 }
 
 [data-amplify-authenticator] .amplify-button--primary:hover {
-  background: linear-gradient(to right, #312e81, #2563eb);
+  background: #2563eb;
 }
 
 [data-amplify-authenticator] .amplify-button--link {
-  color: #1e1b4b;
+  color: #3b82f6;
 }
 
 [data-amplify-authenticator] .amplify-tabs__item--active {
-  color: #1e1b4b;
+  color: #3b82f6;
   border-color: #3b82f6;
 }
 
@@ -41,14 +43,28 @@ html, body {
 @keyframes pulse-ring {
   0% {
     transform: scale(1);
-    opacity: 0.8;
+    opacity: 0.6;
   }
   100% {
-    transform: scale(1.5);
+    transform: scale(1.8);
     opacity: 0;
   }
 }
 
 .animate-pulse-ring {
-  animation: pulse-ring 1.5s ease-out infinite;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* 呼吸アニメーション（接続待機中マイクボタン用） */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
 }

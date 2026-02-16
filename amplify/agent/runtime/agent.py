@@ -5,6 +5,8 @@ from strands.experimental.bidi import BidiAgent
 from strands.experimental.bidi.types.events import BidiAudioInputEvent
 from strands.experimental.bidi.tools import stop_conversation
 
+from strands_tools import rss
+
 from config import get_model, SYSTEM_PROMPT
 from tools import get_current_time, simple_calculator
 
@@ -94,7 +96,7 @@ async def websocket_handler(websocket, context):
     model = get_model()
     agent = BidiAgent(
         model=model,
-        tools=[stop_conversation, get_current_time, simple_calculator],
+        tools=[stop_conversation, get_current_time, simple_calculator, rss],
         system_prompt=SYSTEM_PROMPT,
     )
 

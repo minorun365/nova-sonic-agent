@@ -1,3 +1,4 @@
 bedrock-agentcore
 strands-agents[bidi,otel]
+strands-agents-tools[rss]
 aws-opentelemetry-distro

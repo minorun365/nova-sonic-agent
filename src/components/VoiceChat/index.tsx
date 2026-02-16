@@ -95,19 +95,19 @@ export function VoiceChat() {
   const isConnected = ws.connectionStatus === 'connected';
 
   return (
-    <div className="flex flex-col h-full max-w-3xl mx-auto">
+    <div className="flex flex-col h-full max-w-2xl mx-auto px-4">
       {/* ステータスバー */}
-      <div className="flex items-center justify-between px-4 py-2 border-b bg-white">
+      <div className="flex items-center justify-between py-4">
         <ConnectionStatus status={ws.connectionStatus} />
         <button
           onClick={handleConnect}
           className={`
-            px-4 py-1.5 rounded-lg text-sm font-medium transition-colors
+            px-5 py-2 rounded-full text-sm font-medium transition-all duration-200
             ${ws.connectionStatus === 'disconnected'
-              ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+              ? 'bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md'
               : ws.connectionStatus === 'connecting'
-                ? 'bg-gray-300 text-gray-500 cursor-wait'
-                : 'bg-red-100 text-red-700 hover:bg-red-200'
+                ? 'bg-gray-200 text-gray-400 cursor-wait'
+                : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600'
             }
           `}
           disabled={ws.connectionStatus === 'connecting'}
@@ -118,7 +118,7 @@ export function VoiceChat() {
 
       {/* エラー表示 */}
       {error && (
-        <div className="mx-4 mt-2 px-4 py-2 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
+        <div className="mx-0 mt-2 px-4 py-2 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
           {error}
         </div>
       )}
@@ -127,7 +127,7 @@ export function VoiceChat() {
       <TranscriptView entries={transcripts} activeTool={activeTool} />
 
       {/* マイクボタン */}
-      <div className="flex justify-center py-6 bg-white border-t">
+      <div className="flex justify-center py-8">
         <MicButton
           isRecording={audioInput.isRecording}
           isConnected={isConnected}
