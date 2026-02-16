@@ -158,7 +158,6 @@ voice-agent/
 │   └── test/
 │       ├── setup.ts                   # vitest セットアップ（モック）
 │       └── mocks.ts                   # Amplify モック
-├── experiment/                         # Phase 1（そのまま残存）
 ├── docs/
 ├── package.json
 ├── vite.config.ts

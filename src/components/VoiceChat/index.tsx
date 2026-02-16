@@ -9,15 +9,26 @@ import type { TranscriptEntry } from './types.ts';
 
 export function VoiceChat() {
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
+  const [isAssistantSpeaking, setIsAssistantSpeaking] = useState(false);
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const audioOutput = useAudioOutput();
 
   const handleTranscript = useCallback((role: string, text: string, isFinal: boolean) => {
+    if (role === 'assistant') {
+      if (!isFinal) {
+        // 非finalはインジケーターのみ表示（テキストは出さない）
+        setIsAssistantSpeaking(true);
+        return;
+      }
+      // final → インジケーターを消して履歴に追加
+      setIsAssistantSpeaking(false);
+    }
+
     setTranscripts((prev) => {
       const lastIdx = prev.length - 1;
-      // 同じロールの非finalエントリがあれば上書き（非final→非final も final→確定 も）
+      // 同じロールの非finalエントリがあれば上書き（ユーザーのリアルタイム表示用）
       if (lastIdx >= 0 && prev[lastIdx].role === role && !prev[lastIdx].isFinal) {
         const updated = [...prev];
         updated[lastIdx] = { ...updated[lastIdx], text, isFinal };
@@ -124,7 +135,7 @@ export function VoiceChat() {
       )}
 
       {/* トランスクリプト */}
-      <TranscriptView entries={transcripts} activeTool={activeTool} />
+      <TranscriptView entries={transcripts} isAssistantSpeaking={isAssistantSpeaking} activeTool={activeTool} />
 
       {/* マイクボタン */}
       <div className="flex justify-center py-8">

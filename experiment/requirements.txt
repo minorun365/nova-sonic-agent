@@ -1,2 +1,0 @@
-strands-agents[bidi]
-botocore[crt]

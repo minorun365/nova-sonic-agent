@@ -5,7 +5,7 @@ import type { TranscriptEntry } from './types.ts';
 
 describe('TranscriptView', () => {
   it('エントリがないときプレースホルダーを表示', () => {
-    render(<TranscriptView entries={[]} activeTool={null} />);
+    render(<TranscriptView entries={[]} isAssistantSpeaking={false} activeTool={null} />);
     expect(screen.getByText('マイクボタンを押して話しかけてください')).toBeInTheDocument();
   });
 
@@ -13,7 +13,7 @@ describe('TranscriptView', () => {
     const entries: TranscriptEntry[] = [
       { role: 'user', text: 'こんにちは', isFinal: true, timestamp: Date.now() },
     ];
-    render(<TranscriptView entries={entries} activeTool={null} />);
+    render(<TranscriptView entries={entries} isAssistantSpeaking={false} activeTool={null} />);
     expect(screen.getByText('こんにちは')).toBeInTheDocument();
   });
 
@@ -21,13 +21,13 @@ describe('TranscriptView', () => {
     const entries: TranscriptEntry[] = [
       { role: 'assistant', text: 'お手伝いします', isFinal: true, timestamp: Date.now() },
     ];
-    render(<TranscriptView entries={entries} activeTool={null} />);
+    render(<TranscriptView entries={entries} isAssistantSpeaking={false} activeTool={null} />);
     expect(screen.getByText('お手伝いします')).toBeInTheDocument();
   });
 
   it('ツール実行中の表示', () => {
-    render(<TranscriptView entries={[]} activeTool="get_current_time" />);
-    expect(screen.getByText('get_current_time を実行中...')).toBeInTheDocument();
+    render(<TranscriptView entries={[]} isAssistantSpeaking={false} activeTool="get_current_time" />);
+    expect(screen.getByText('get_current_timeツールを利用中…')).toBeInTheDocument();
   });
 
   it('複数エントリの会話表示', () => {
@@ -35,7 +35,7 @@ describe('TranscriptView', () => {
       { role: 'user', text: '今何時？', isFinal: true, timestamp: 1 },
       { role: 'assistant', text: '15時です', isFinal: true, timestamp: 2 },
     ];
-    render(<TranscriptView entries={entries} activeTool={null} />);
+    render(<TranscriptView entries={entries} isAssistantSpeaking={false} activeTool={null} />);
     expect(screen.getByText('今何時？')).toBeInTheDocument();
     expect(screen.getByText('15時です')).toBeInTheDocument();
   });
@@ -44,7 +44,7 @@ describe('TranscriptView', () => {
     const entries: TranscriptEntry[] = [
       { role: 'user', text: 'まだ途中...', isFinal: false, timestamp: Date.now() },
     ];
-    render(<TranscriptView entries={entries} activeTool={null} />);
+    render(<TranscriptView entries={entries} isAssistantSpeaking={false} activeTool={null} />);
     const el = screen.getByText('まだ途中...');
     expect(el.className).toContain('opacity-60');
   });
