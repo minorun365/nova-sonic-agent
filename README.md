@@ -4,6 +4,8 @@ Amazon Nova Sonic を使った音声対話型の英会話練習アプリです�
 
 簡単なTool Useを行なって、AWSのアップデート情報などを確認してもらうこともできます。
 
+<img width="1177" height="906" alt="スクリーンショット 2026-02-16 23 50 23" src="https://github.com/user-attachments/assets/dfee5224-6a18-4d7c-8b2c-5b510508adfd" />
+
 ## アーキテクチャ
 
 - **フロントエンド**: React + Tailwind CSS（Vite）
