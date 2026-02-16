@@ -1,0 +1,32 @@
+# ログファイル
+logs
+*.log
+npm-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# エディタ設定
+.vscode/*
+.idea
+.DS_Store
+*.sw?
+
+# Amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*
+
+# Python
+.venv
+__pycache__
+*.pyc
+uv.lock
+.pytest_cache
+
+# 環境変数
+.env
+.env.local
+.env.*.local

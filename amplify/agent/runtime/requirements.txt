@@ -1,0 +1,3 @@
+bedrock-agentcore
+strands-agents[bidi,otel]
+aws-opentelemetry-distro
