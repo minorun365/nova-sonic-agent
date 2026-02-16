@@ -340,35 +340,47 @@ new iam.PolicyStatement({
 - リソースは Runtime ARN そのもの + ワイルドカード（`/runtime-endpoint/DEFAULT` 等のサブリソースもカバー）
 - `Amplify.getConfig()` は `custom` フィールドを返さない → `amplify_outputs.json` を直接 import して使う
 
-### AudioWorklet 実装
+### 音声入出力の実装
 
-#### マイク入力（pcm-capture-processor.js）
+#### マイク入力（AudioWorklet: pcm-capture-processor.js）
 - `AudioContext({ sampleRate: 16000 })` で 16kHz に設定
 - Float32 → Int16 変換: `s < 0 ? s * 0x8000 : s * 0x7FFF`
 - `postMessage()` で ArrayBuffer を main thread に転送（Transferable で効率的）
 - main thread で Int16 ArrayBuffer → base64 変換して WebSocket 送信
 
-#### スピーカー出力（pcm-playback-processor.js）
-- リングバッファ方式で低レイテンシ再生（最大 5 秒分 @ 16kHz）
-- `postMessage('clearBuffer')` で割り込み時にバッファクリア
-- Int16 → Float32 変換: `int16Data[i] / 32768`
+#### スピーカー出力（AudioBufferSourceNode スケジューリング方式）
+
+**重要**: AudioWorklet リングバッファ方式は使わない。以下の問題がある:
+- `AudioContext({ sampleRate: 16000 })` は macOS で不安定（ハードウェアは通常 48kHz）
+- リングバッファはネットワークジッターに弱い（バッファ枯渇→無音→溜まると早送り再生）
+- `AudioContext.resume()` なしだとブラウザの自動再生ポリシーで音が出ない
+
+**採用方式: AudioBufferSourceNode スケジューリング**
+- `new AudioContext()` でネイティブサンプルレートを使用（16kHz を強制しない）
+- 各 PCM チャンクを `ctx.createBuffer(1, length, 16000)` で 16kHz AudioBuffer として生成
+- `source.start(nextPlayTime)` で前のチャンクの直後にスケジュール
+- Web Audio API が自動でリサンプリング（16kHz → ネイティブ 48kHz）
+- ネットワーク遅延時は `Math.max(nextPlayTime, now)` で「今すぐ」に回復
+- 割り込み時は全 active source の `stop()` を呼んでバッファクリア
+
+```typescript
+const audioBuffer = ctx.createBuffer(1, int16Data.length, 16000);
+const source = ctx.createBufferSource();
+source.buffer = audioBuffer;
+source.connect(ctx.destination);
+const startTime = Math.max(nextPlayTimeRef.current, ctx.currentTime);
+source.start(startTime);
+nextPlayTimeRef.current = startTime + audioBuffer.duration;
+```
 
 #### base64 変換ユーティリティ
 ```typescript
-// ArrayBuffer → base64
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary);
-}
-
-// base64 → ArrayBuffer
-function base64ToArrayBuffer(base64: string): ArrayBuffer {
+// base64 → Int16Array
+function base64ToInt16(base64: string): Int16Array {
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
+  return new Int16Array(bytes.buffer);
 }
 ```
 
@@ -400,31 +412,34 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
 - 初回デプロイ: Cognito + AgentCore Runtime 作成で約2分
 - `amplify_outputs.json` が自動生成され、フロントエンドの設定に使われる
 
-### トランスクリプトの重複表示バグと修正
+### トランスクリプト表示の注意点
 
 Nova Sonic はストリーミング中に `isFinal=false` の部分トランスクリプトを送り、最後に `isFinal=true` の確定トランスクリプトを送る。
 
-**バグ（修正前）:**
+#### 問題1: 重複表示
 `isFinal=false` のときだけ直前エントリを上書きしていたため、`isFinal=true` が来ると新しいエントリとして追加され、同じ応答が吹き出しで2回表示された。
+→ **修正**: `isFinal` の値に関わらず、直前エントリが同じロールで `isFinal=false` なら上書き。
+
+#### 問題2: テキストが音声より先に届く（重要）
+Nova Sonic のトランスクリプトは**音声再生より先にテキストが到着**する。アシスタントの非final テキストをそのまま表示すると:
+- まだ話していない「未来のテキスト」が吹き出しに表示される
+- 吹き出しの内容が急に変わり、今読み上げ中の内容が消える
+
+→ **修正**: アシスタントの非final テキストは表示せず、**話し中インジケーター（・・・バウンスドット）** を表示。final のみ吹き出しに追加する「字幕方式」を採用。ユーザー側の非final はリアルタイム表示（自分の発話なので先行しても問題ない）。
 
 ```typescript
-// NG: isFinal=true のとき上書きロジックをスキップしてしまう
-if (!isFinal) {
-  // ...上書きロジック
+// アシスタント非final → インジケーターのみ
+if (role === 'assistant' && !isFinal) {
+  setIsAssistantSpeaking(true);
+  return;
 }
-return [...prev, { role, text, isFinal, timestamp }]; // 常に新規追加
+// final → インジケーター消去 + 履歴に追加
+if (role === 'assistant') setIsAssistantSpeaking(false);
 ```
 
-**修正後:**
-`isFinal` の値に関わらず、直前エントリが同じロールで `isFinal=false` なら上書き。
+### strands_tools（コミュニティツール）
 
-```typescript
-// OK: 直前が non-final なら常に上書き（non-final→non-final も non-final→final も）
-const lastIdx = prev.length - 1;
-if (lastIdx >= 0 && prev[lastIdx].role === role && !prev[lastIdx].isFinal) {
-  const updated = [...prev];
-  updated[lastIdx] = { ...updated[lastIdx], text, isFinal };
-  return updated;
-}
-return [...prev, { role, text, isFinal, timestamp }];
-```
+- `pip install strands-agents-tools[rss]` でインストール
+- `from strands_tools import rss` でインポートし、BidiAgent の tools リストに直接渡せる
+- システムプロンプトでフィード URL を指示する運用（例: AWS What's New RSS）
+- その他のツールも `strands-agents-tools[ツール名]` でインストール可能

@@ -1,6 +1,6 @@
 # Voice Agent - 仕様書
 
-音声で会話できる AI エージェントのデモアプリ。Amazon Nova Sonic + Strands Agents + Bedrock AgentCore を活用し、リアルタイム音声対話とツール使用を実現する。
+Nova Sonic を使った英会話練習アプリ。Amazon Nova Sonic + Strands Agents + Bedrock AgentCore を活用し、リアルタイム音声対話とツール使用を実現する。英会話チューター「ノヴァ」が日本人ユーザーに対して英会話を教える。
 
 ## 技術スタック
 
@@ -130,7 +130,7 @@ voice-agent/
 │       ├── resource.ts                 # AgentCore Runtime CDK定義
 │       └── runtime/
 │           ├── Dockerfile              # Python 3.13 slim（ARM64）
-│           ├── requirements.txt        # strands-agents[bidi,otel], bedrock-agentcore
+│           ├── requirements.txt        # strands-agents[bidi,otel], strands-agents-tools[rss], bedrock-agentcore
 │           ├── agent.py                # @app.websocket + BidiAgent ブリッジ
 │           ├── config.py               # Nova Sonic モデル設定・システムプロンプト
 │           └── tools/
@@ -153,8 +153,7 @@ voice-agent/
 │   │   ├── useAudioInput.ts           # マイク → PCM → base64 → 送信
 │   │   └── useAudioOutput.ts          # 受信 → PCM → スピーカー再生
 │   ├── audio/
-│   │   ├── pcm-capture-processor.js   # AudioWorklet: マイク→Int16
-│   │   └── pcm-playback-processor.js  # AudioWorklet: Int16→スピーカー
+│   │   └── pcm-capture-processor.js   # AudioWorklet: マイク→Int16
 │   └── test/
 │       ├── setup.ts                   # vitest セットアップ（モック）
 │       └── mocks.ts                   # Amplify モック
@@ -177,9 +176,10 @@ AgentCore の `@app.websocket` デコレータで WebSocket ハンドラを実�
 
 #### フロントエンド設計
 
-- AudioWorklet で PCM 16kHz 16bit mono の音声キャプチャ・再生
-- リングバッファによる低レイテンシ再生
-- 割り込み時は `clearBuffer` でバッファクリア
+- AudioWorklet で PCM 16kHz 16bit mono の音声キャプチャ
+- AudioBufferSourceNode スケジューリング方式で安定再生（16kHz→ネイティブ自動リサンプリング）
+- 割り込み時は全 active source の `stop()` でバッファクリア
+- アシスタントの非final トランスクリプトは話し中インジケーター表示（テキストが音声より先に届くため）
 - hooks で WebSocket・マイク・スピーカーをそれぞれ管理し、VoiceChat で統合
 
 #### 認証フロー

@@ -1,4 +1,4 @@
-# Voice Agent - TODO
+# Nova Sonic Agent - TODO
 
 ## 完了済み（Phase 1: フィジビリティ検証）
 
@@ -22,7 +22,7 @@
 - [x] バックエンド: Nova Sonic 設定（`config.py`）, ツール（`tools/`）
 - [x] バックエンド: Dockerfile, requirements.txt
 - [x] AudioWorklet: マイク→PCM Int16（`pcm-capture-processor.js`）
-- [x] AudioWorklet: PCM Int16→スピーカー（`pcm-playback-processor.js`）
+- [x] AudioBufferSourceNode: PCM Int16→スピーカー再生（`useAudioOutput.ts`）
 - [x] hooks: useWebSocket, useAudioInput, useAudioOutput
 - [x] UI: VoiceChat, MicButton, TranscriptView, ConnectionStatus
 - [x] App.tsx + main.tsx（Authenticator 統合）
@@ -38,16 +38,25 @@
 - [x] ブラウザからの音声対話が E2E で動作確認
 - [x] トランスクリプト重複表示バグ修正（non-final → final の上書きロジック）
 
-## Phase 2: 残タスク
+## 完了済み（Phase 3: UI改善・安定化・機能追加）
 
-- [ ] 割り込み・ツール使用のブラウザ動作確認
-- [ ] レイテンシ計測（ブラウザ経由）
+- [x] UIデザイン刷新: Apple風クリーン&明るいデザイン（白ベース、blue-500アクセント、ピル型ボタン）
+- [x] 音声再生安定化: AudioWorklet リングバッファ → AudioBufferSourceNode スケジューリング方式
+- [x] トランスクリプト表示改善: アシスタント非final は話し中インジケーター（・・・）で表示
+- [x] システムプロンプト: 英会話チューター「ノヴァ」に変更
+- [x] RSS ツール追加: `strands_tools.rss` で AWS What's New フィード取得
+- [x] GitHub リポジトリ作成・プッシュ（Public）
+
+## Phase 3: 残タスク
+
+- [ ] Amplify Console で本番デプロイ（GitHub連携）
+- [ ] 本番環境での動作確認
 - [ ] エラーハンドリング改善
-- [ ] 本番デプロイ（Amplify Console）
+- [ ] レイテンシ計測（ブラウザ経由）
 
 ## 参考
 
 - 仕様書: `docs/spec.md`
 - ナレッジ: `docs/knowledge.md`
-- ベースプロジェクト: https://github.com/minorun365/marp-agent
+- リポジトリ: https://github.com/minorun365/nova-sonic-agent
 - AgentCore 双方向ストリーミングサンプル: https://github.com/awslabs/amazon-bedrock-agentcore-samples/tree/main/01-tutorials/01-AgentCore-runtime/06-bi-directional-streaming
