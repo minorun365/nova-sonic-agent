@@ -48,7 +48,7 @@ export function createVoiceAgent({ stack, userPool, userPoolClient, nameSuffix }
   // JWT 認証ではなく IAM (SigV4) 認証を使用する。
   // Cognito Identity Pool の認証済みロールに権限を付与して制御する。
 
-  const runtimeName = nameSuffix ? `voice_agent_${nameSuffix}` : 'voice_agent';
+  const runtimeName = nameSuffix ? `nova_sonic_${nameSuffix}` : 'nova_sonic';
 
   const runtime = new agentcore.Runtime(stack, 'VoiceAgentRuntime', {
     runtimeName,
